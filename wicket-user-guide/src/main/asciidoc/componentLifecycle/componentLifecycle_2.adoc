@@ -1,0 +1,15 @@
+
+
+
+Class _Component_ comes with a number of hook methods that can be overridden in order to customize component behavior during its lifecycle.
+In the following table these methods are grouped according to the stage in which they are invoked (and they are sorted by execution order):
+
+|===
+|*Cycle stage* | *Involved methods*
+|Initialization | constructor, _onInitialize()_
+|Rendering | _onConfigure()_, _onBeforeRender()_, _renderHead()_, _onRender()_, _onComponentTag()_, _onComponentTagBody()_, _onAfterRender()_
+|Removed | _onRemove()_
+|Detached | _onDetach()_
+|===
+
+Now let's take a closer look at each stage and its hook methods.

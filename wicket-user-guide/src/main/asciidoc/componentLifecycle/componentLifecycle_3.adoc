@@ -1,0 +1,8 @@
+
+
+
+This stage is the beginning of the component lifecycle.
+
+A component is instantiated by application code (or by Wicket in case of bookmarkable page) and added to a parental component. As soon as the component is contained in a component tree rooted in a page, a “post”-constructor _onInitialize()_ is called where we can execute custom initialization of our component.
+
+When we override this method we have to call _super.onInitialize()_, usually before anything else in that method.

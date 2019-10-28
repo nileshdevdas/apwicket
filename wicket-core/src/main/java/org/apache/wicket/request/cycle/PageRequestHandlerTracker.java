@@ -1,0 +1,137 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.apache.wicket.request.cycle;
+
+import org.apache.wicket.MetaDataKey;
+import org.apache.wicket.core.request.handler.IPageRequestHandler;
+import org.apache.wicket.request.IRequestHandler;
+import org.apache.wicket.request.IRequestHandlerDelegate;
+
+/**
+ * Registers and retrieves first and last executed {@link IPageRequestHandler} in a request cycle.
+ * Can be used to find out what is the requested page and what is the actual response page.
+ * <p>
+ * To use it an application needs to register it with:
+ *     <pre><code>
+ *          application.getRequestCycleListeners().add(new PageRequestHandlerTracker());
+ *     </code></pre>
+ * <p>
+ * The result can then be accessed at the end of each {@link RequestCycle} with:
+ *     <pre><code>
+ *          IPageRequestHandler first = PageRequestHandlerTracker.getFirstHandler(RequestCycle.get());
+ *          IPageRequestHandler last = PageRequestHandlerTracker.getLastHandler(RequestCycle.get());
+ *     </code></pre>
+ *
+ * @since 1.5.8
+ */
+public class PageRequestHandlerTracker implements IRequestCycleListener
+{
+	/**
+	 * The key for the first handler
+	 */
+	public static final  MetaDataKey<IPageRequestHandler> FIRST_HANDLER_KEY = new MetaDataKey<>() {};
+
+	/**
+	 * The key for the last handler
+	 */
+	public static final MetaDataKey<IPageRequestHandler> LAST_HANDLER_KEY = new MetaDataKey<>() {};
+
+	@Override
+	public void onRequestHandlerResolved(RequestCycle cycle, IRequestHandler handler)
+	{
+		registerFirstHandler(cycle,handler);
+		registerLastHandler(cycle,handler);
+	}
+
+	/**
+	 * Registers pagerequesthandler when it's resolved ,keeps up with the most recent handler resolved
+	 *
+	 * @param cycle
+	 *      the current request cycle
+	 * @param handler
+	 *      the request handler to register
+	 */
+	private void registerLastHandler(RequestCycle cycle, IRequestHandler handler)
+	{
+		final IPageRequestHandler pageRequestHandler = findPageRequestHandler(handler);
+		if (pageRequestHandler != null)
+		{
+			cycle.setMetaData(LAST_HANDLER_KEY, pageRequestHandler);
+		}
+	}
+
+	/**
+	 * Registers firsthandler if it's not already registered
+	 *
+	 * @param cycle
+	 *      the current request cycle
+	 * @param handler
+	 *      the request handler to register
+	 */
+	private void registerFirstHandler(RequestCycle cycle, IRequestHandler handler)
+	{
+		if (getFirstHandler(cycle) == null)
+		{
+			final IPageRequestHandler pageRequestHandler = findPageRequestHandler(handler);
+			if (pageRequestHandler != null)
+			{
+				cycle.setMetaData(FIRST_HANDLER_KEY, pageRequestHandler);
+			}
+		}
+	}
+
+	/**
+	 * Looking for IPageRequestHandler 
+	 * 
+	 * @param handler
+	 * @return IPageRequestHandler if exist otherwise null
+	 */
+	private IPageRequestHandler findPageRequestHandler(IRequestHandler handler)
+	{
+		if (handler instanceof IPageRequestHandler)
+		{
+			return (IPageRequestHandler)handler;
+		}
+	    if (handler instanceof IRequestHandlerDelegate)
+	    {
+	    	return findPageRequestHandler(((IRequestHandlerDelegate)handler).getDelegateHandler());
+	    }
+	    return null;
+	}
+
+   /**
+	* retrieves last handler from request cycle
+	*
+	* @param cycle
+	* @return last handler
+	*/
+	public static IPageRequestHandler getLastHandler(RequestCycle cycle)
+	{
+		return cycle.getMetaData(LAST_HANDLER_KEY);
+	}
+
+	/**
+	 * retrieves first handler from the request cycle
+	 *
+	 * @param cycle
+	 * @return first handler
+	 */
+	public static IPageRequestHandler getFirstHandler(RequestCycle cycle)
+	{
+		return cycle.getMetaData(FIRST_HANDLER_KEY);
+	}
+}
