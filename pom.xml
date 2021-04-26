@@ -139,7 +139,7 @@
 		<commons-collections.version>3.2.2</commons-collections.version>
 		<commons-collections4.version>4.4</commons-collections4.version>
 		<commons-fileupload.version>1.4</commons-fileupload.version>
-		<commons-io.version>2.6</commons-io.version>
+		<commons-io.version>2.7</commons-io.version>
 		<commons-lang3.version>3.9</commons-lang3.version>
 		<guice.version>4.2.2</guice.version>
 		<el-impl.version>2.2.1-b05</el-impl.version>
